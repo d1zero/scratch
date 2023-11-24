@@ -61,11 +61,11 @@ func main() {
 	}
 	writer.Flush()
 
-	if err := os.WriteFile("go.mod", goMod.Bytes(), 0666); err != nil {
+	if err := os.WriteFile(fmt.Sprintf("%s/go.mod", *taskPtr), goMod.Bytes(), 0666); err != nil {
 		panic(err)
 	}
 
-	if err := os.WriteFile("internal/app/app.go", []byte(templates.AppTemplate), 0666); err != nil {
+	if err := os.WriteFile(fmt.Sprintf("%s/internal/app/app.go", *taskPtr), []byte(templates.AppTemplate), 0666); err != nil {
 		panic(err)
 	}
 }
