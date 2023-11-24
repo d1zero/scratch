@@ -21,12 +21,12 @@ func main() {
 		return
 	}
 
-	err := os.MkdirAll("cmd/app", 0777)
+	err := os.MkdirAll(fmt.Sprintf("%s/cmd/app", *taskPtr), 0777)
 	if err != nil {
 		panic(err)
 	}
 
-	err = os.MkdirAll("internal/app", 0777)
+	err = os.MkdirAll(fmt.Sprintf("%s/internal/app", *taskPtr), 0777)
 	if err != nil {
 		panic(err)
 	}
