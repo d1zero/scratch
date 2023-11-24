@@ -45,7 +45,7 @@ func main() {
 	}
 	writer.Flush()
 
-	if err := os.WriteFile("cmd/app/main.go", b.Bytes(), 0666); err != nil {
+	if err := os.WriteFile(fmt.Sprintf("%s/cmd/app/main.go", *taskPtr), b.Bytes(), 0666); err != nil {
 		panic(err)
 	}
 
