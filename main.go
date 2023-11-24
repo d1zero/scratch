@@ -6,8 +6,9 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"scratch/templates"
 	"text/template"
+
+	"github.com/d1zero/scratch/templates"
 )
 
 func main() {
