@@ -49,4 +49,15 @@ func New(cmd *cobra.Command, args []string) {
 	})
 
 	pkg.WriteToFile(fmt.Sprintf("%s/.gitignore", serviceName), templates.GitIgnoreTemplate, struct{}{})
+	pkg.WriteToFile(fmt.Sprintf("%s/Makefile", serviceName), templates.BuildMakefileTemplate(allFlags), struct{}{})
+
+	if allFlags.Postgres {
+		err = os.MkdirAll(fmt.Sprintf("%s/db/migrations", serviceName), 0777)
+		if err != nil {
+			panic(err)
+		}
+
+		pkg.WriteToFile(fmt.Sprintf("%s/db/migrations/000001_initial.up.sql", serviceName), "", struct{}{})
+		pkg.WriteToFile(fmt.Sprintf("%s/db/migrations/000001_initial.down.sql", serviceName), "", struct{}{})
+	}
 }

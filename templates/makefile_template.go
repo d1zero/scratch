@@ -1,0 +1,35 @@
+package templates
+
+import "github.com/d1zero/scratch/internal/models"
+
+func BuildMakefileTemplate(flags models.AllFlags) string {
+	result := `test:
+	go test -v ./...
+
+lint:
+	golangci-lint run --config=.golangci.yml`
+
+	if flags.Postgres {
+		result += `
+
+migrate-new:
+	migrate create -ext sql -dir db/migrations -seq $(name)
+
+migrate-up:
+	migrate -path db/migrations \
+	-database ${DB} \
+	-verbose up
+
+migrate-down:
+	migrate -path db/migrations \
+	-database ${DB} \
+	-verbose down
+
+migrate-version:
+	migrate -path db/migrations \
+	-database ${DB} \
+	-verbose version`
+	}
+
+	return result
+}
