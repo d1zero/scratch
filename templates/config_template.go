@@ -4,7 +4,7 @@ import (
 	"github.com/d1zero/scratch/internal/models"
 )
 
-func BuildConfigTemplate(flags models.AllFlags) string {
+func BuildConfigTemplate(flags models.EnabledIntegrations) string {
 	result := `package app
 
 import (

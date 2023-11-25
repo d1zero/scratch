@@ -2,7 +2,7 @@ package templates
 
 import "github.com/d1zero/scratch/internal/models"
 
-func BuildMakefileTemplate(flags models.AllFlags) string {
+func BuildMakefileTemplate(flags models.EnabledIntegrations) string {
 	result := `test:
 	go test -v ./...
 

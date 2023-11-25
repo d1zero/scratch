@@ -2,7 +2,7 @@ package templates
 
 import "github.com/d1zero/scratch/internal/models"
 
-func BuildAppTemplate(flags models.AllFlags) string {
+func BuildAppTemplate(flags models.EnabledIntegrations) string {
 	result := `package app
 
 import (

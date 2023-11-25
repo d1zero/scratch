@@ -6,25 +6,28 @@ import (
 	"github.com/d1zero/scratch/internal/pkg"
 	"github.com/d1zero/scratch/templates"
 	"github.com/spf13/cobra"
-	"log/slog"
+	MultipleChoice "github.com/thewolfnl/go-multiplechoice"
 	"os"
 )
 
 func New(cmd *cobra.Command, args []string) {
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	if len(args) == 0 {
+		fmt.Println("error: new service name must not be empty")
+		return
+	}
+
+	integrations := MultipleChoice.MultiSelection("Choose integration to enable in project: ", []string{
+		models.Postgres,
+		models.Kafka,
+		models.Grpc,
+		models.Http,
+	})
 
 	serviceName := args[0]
 
-	postgres, err := cmd.Flags().GetBool("postgres")
-	if err != nil {
-		logger.Error("error while getting postgres param: %s", err)
-	}
+	enabledIntegrations := pkg.ParseIntegrations(integrations)
 
-	allFlags := models.AllFlags{
-		Postgres: postgres,
-	}
-
-	err = os.MkdirAll(fmt.Sprintf("%s/cmd/app", serviceName), 0777)
+	err := os.MkdirAll(fmt.Sprintf("%s/cmd/app", serviceName), 0777)
 	if err != nil {
 		panic(err)
 	}
@@ -38,9 +41,9 @@ func New(cmd *cobra.Command, args []string) {
 		ProjectName: serviceName,
 	})
 
-	pkg.WriteToFile(fmt.Sprintf("%s/internal/app/app.go", serviceName), templates.BuildAppTemplate(allFlags), struct{}{})
+	pkg.WriteToFile(fmt.Sprintf("%s/internal/app/app.go", serviceName), templates.BuildAppTemplate(enabledIntegrations), struct{}{})
 
-	pkg.WriteToFile(fmt.Sprintf("%s/internal/app/config.go", serviceName), templates.BuildConfigTemplate(allFlags), templates.GoModData{
+	pkg.WriteToFile(fmt.Sprintf("%s/internal/app/config.go", serviceName), templates.BuildConfigTemplate(enabledIntegrations), templates.GoModData{
 		ModuleName: serviceName,
 	})
 
@@ -49,9 +52,9 @@ func New(cmd *cobra.Command, args []string) {
 	})
 
 	pkg.WriteToFile(fmt.Sprintf("%s/.gitignore", serviceName), templates.GitIgnoreTemplate, struct{}{})
-	pkg.WriteToFile(fmt.Sprintf("%s/Makefile", serviceName), templates.BuildMakefileTemplate(allFlags), struct{}{})
+	pkg.WriteToFile(fmt.Sprintf("%s/Makefile", serviceName), templates.BuildMakefileTemplate(enabledIntegrations), struct{}{})
 
-	if allFlags.Postgres {
+	if enabledIntegrations.Postgres {
 		err = os.MkdirAll(fmt.Sprintf("%s/db/migrations", serviceName), 0777)
 		if err != nil {
 			panic(err)
@@ -60,4 +63,7 @@ func New(cmd *cobra.Command, args []string) {
 		pkg.WriteToFile(fmt.Sprintf("%s/db/migrations/000001_initial.up.sql", serviceName), "", struct{}{})
 		pkg.WriteToFile(fmt.Sprintf("%s/db/migrations/000001_initial.down.sql", serviceName), "", struct{}{})
 	}
+
+	pkg.ReformatFile(fmt.Sprintf("%s/internal/app/config.go", serviceName))
+	pkg.ReformatFile(fmt.Sprintf("%s/internal/app/app.go", serviceName))
 }

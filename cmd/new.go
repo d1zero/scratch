@@ -20,6 +20,4 @@ var newCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(newCmd)
-
-	newCmd.PersistentFlags().Bool("postgres", false, "adds postgres support to service")
 }
