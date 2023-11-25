@@ -6,3 +6,8 @@ tasks:
 
   clear:
     cmd: rm ./scratch
+
+  rebuild:
+    cmds:
+      - rm ./scratch
+      - go build -o scratch

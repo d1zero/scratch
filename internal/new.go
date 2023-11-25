@@ -27,7 +27,13 @@ func New(cmd *cobra.Command, args []string) {
 
 	pkg.WriteToFile(fmt.Sprintf("%s/internal/app/app.go", serviceName), templates.AppTemplate, struct{}{})
 
+	pkg.WriteToFile(fmt.Sprintf("%s/internal/app/config.go", serviceName), templates.ConfigTemplate, templates.GoModData{
+		ModuleName: serviceName,
+	})
+
 	pkg.WriteToFile(fmt.Sprintf("%s/go.mod", serviceName), templates.GoModTemplate, templates.GoModData{
 		ModuleName: serviceName,
 	})
+
+	pkg.WriteToFile(fmt.Sprintf("%s/.gitignore", serviceName), templates.GitIgnoreTemplate, struct{}{})
 }
