@@ -2,16 +2,29 @@ package internal
 
 import (
 	"fmt"
+	"github.com/d1zero/scratch/internal/models"
 	"github.com/d1zero/scratch/internal/pkg"
 	"github.com/d1zero/scratch/templates"
 	"github.com/spf13/cobra"
+	"log/slog"
 	"os"
 )
 
 func New(cmd *cobra.Command, args []string) {
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+
 	serviceName := args[0]
 
-	err := os.MkdirAll(fmt.Sprintf("%s/cmd/app", serviceName), 0777)
+	postgres, err := cmd.Flags().GetBool("postgres")
+	if err != nil {
+		logger.Error("error while getting postgres param: %s", err)
+	}
+
+	allFlags := models.AllFlags{
+		Postgres: postgres,
+	}
+
+	err = os.MkdirAll(fmt.Sprintf("%s/cmd/app", serviceName), 0777)
 	if err != nil {
 		panic(err)
 	}
@@ -25,9 +38,9 @@ func New(cmd *cobra.Command, args []string) {
 		ProjectName: serviceName,
 	})
 
-	pkg.WriteToFile(fmt.Sprintf("%s/internal/app/app.go", serviceName), templates.AppTemplate, struct{}{})
+	pkg.WriteToFile(fmt.Sprintf("%s/internal/app/app.go", serviceName), templates.BuildAppTemplate(allFlags), struct{}{})
 
-	pkg.WriteToFile(fmt.Sprintf("%s/internal/app/config.go", serviceName), templates.ConfigTemplate, templates.GoModData{
+	pkg.WriteToFile(fmt.Sprintf("%s/internal/app/config.go", serviceName), templates.BuildConfigTemplate(allFlags), templates.GoModData{
 		ModuleName: serviceName,
 	})
 

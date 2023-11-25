@@ -1,24 +1,13 @@
-package templates
-
-import "github.com/d1zero/scratch/internal/models"
-
-func BuildAppTemplate(flags models.AllFlags) string {
-	result := `package app
+package app
 
 import (
 	"log/slog"
 	"os"
 	"os/signal"
-	"syscall"`
+	"syscall"
 
-	if flags.Postgres {
-		result += `
-	
-	"github.com/d1zero/scratch/pkg/config/postgres"`
-	}
-
-	result += `
 	"github.com/d1zero/scratch/pkg/config"
+	"github.com/d1zero/scratch/pkg/config/postgres"
 	lgr "github.com/d1zero/scratch/pkg/logger"
 )
 
@@ -43,10 +32,7 @@ func Run() {
 
 	logger := defaultLogger.Sugar()
 	logger.Info("sugared logger initialized successfully")
-`
 
-	if flags.Postgres {
-		result += `
 	db, err := postgres.New(logger, cfg.Postgres)
 	if err != nil {
 		logger.Error("error while connecting postgres: %s", err)
@@ -56,16 +42,9 @@ func Run() {
 
 	logger.Infof("postgres connected successfully")
 
-`
-	}
-
-	result += `
 	exit := make(chan os.Signal)
 
 	signal.Notify(exit, syscall.SIGINT, syscall.SIGTERM)
 
 	<-exit
-}
-`
-	return result
 }
