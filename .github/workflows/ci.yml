@@ -21,7 +21,7 @@ jobs:
           version: v1.54
 
   test:
-    name: Lint
+    name: Test
     runs-on: ubuntu-latest
     strategy:
       matrix:
