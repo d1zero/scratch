@@ -90,5 +90,5 @@ func New(cmd *cobra.Command, args []string) {
 	pkg.ReformatFile(fmt.Sprintf("%s/internal/app/config.go", serviceName))
 	pkg.ReformatFile(fmt.Sprintf("%s/internal/app/app.go", serviceName))
 
-	pkg.DownloadModules()
+	pkg.DownloadModules(serviceName)
 }
