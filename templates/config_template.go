@@ -15,6 +15,11 @@ import (
 	"github.com/d1zero/scratch/pkg/config/postgres"`
 	}
 
+	if flags.Grpc {
+		result += `
+	"github.com/d1zero/scratch/pkg/config/grpc"`
+	}
+
 	result += `
 	"github.com/d1zero/scratch/pkg/logger"
 	"go.uber.org/zap/zapcore"
@@ -26,6 +31,12 @@ type Config struct {
 		result += `
 	Postgres    postgres.Config ` + "`" + `koanf:"postgres" validate:"required"` + "`"
 	}
+
+	if flags.Grpc {
+		result += `
+	GRPC grpc.Config ` + "`" + `koanf:"grpc" validate:"required"` + "`"
+	}
+
 	result += `
 	HealthCheck config.HostPort ` + "`" + `koanf:"healthCheck" validate:"required"` + "`" + `
 }
@@ -39,6 +50,7 @@ func defaultConfig() *Config {
 			Host: "0.0.0.0",
 			Port: "7000",
 		},`
+
 	if flags.Postgres {
 		result += `
 		Postgres: postgres.Config{
@@ -49,6 +61,15 @@ func defaultConfig() *Config {
 			ConnMaxIdleTime: 30,
 		},`
 	}
+
+	if flags.Grpc {
+		result += `
+		GRPC: grpc.Config {
+			Host: "0.0.0.0",
+			Port: "6000",
+		},`
+	}
+
 	result += `
 	}
 }

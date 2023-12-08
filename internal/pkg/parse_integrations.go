@@ -9,6 +9,8 @@ func ParseIntegrations(integrations []string) models.EnabledIntegrations {
 		switch v {
 		case models.Postgres:
 			result.Postgres = true
+		case models.Redis:
+			result.Redis = true
 		case models.Kafka:
 			result.Kafka = true
 		case models.Grpc:

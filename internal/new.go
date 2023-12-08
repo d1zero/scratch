@@ -18,6 +18,7 @@ func New(cmd *cobra.Command, args []string) {
 
 	integrations := MultipleChoice.MultiSelection("Choose integration to enable in project: ", []string{
 		models.Postgres,
+		models.Redis,
 		models.Kafka,
 		models.Grpc,
 		models.Http,
@@ -41,7 +42,9 @@ func New(cmd *cobra.Command, args []string) {
 		ProjectName: serviceName,
 	})
 
-	pkg.WriteToFile(fmt.Sprintf("%s/internal/app/app.go", serviceName), templates.BuildAppTemplate(enabledIntegrations), struct{}{})
+	pkg.WriteToFile(fmt.Sprintf("%s/internal/app/app.go", serviceName), templates.BuildAppTemplate(enabledIntegrations), templates.AppTemplateData{
+		ProjectName: serviceName,
+	})
 
 	pkg.WriteToFile(fmt.Sprintf("%s/internal/app/config.go", serviceName), templates.BuildConfigTemplate(enabledIntegrations), templates.GoModData{
 		ModuleName: serviceName,
@@ -62,6 +65,26 @@ func New(cmd *cobra.Command, args []string) {
 
 		pkg.WriteToFile(fmt.Sprintf("%s/db/migrations/000001_initial.up.sql", serviceName), "", struct{}{})
 		pkg.WriteToFile(fmt.Sprintf("%s/db/migrations/000001_initial.down.sql", serviceName), "", struct{}{})
+	}
+
+	if enabledIntegrations.Grpc {
+		err = os.MkdirAll(fmt.Sprintf("%s/internal/controller/grpc/v1", serviceName), 0777)
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.MkdirAll(fmt.Sprintf("%s/internal/entity", serviceName), 0777)
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.MkdirAll(fmt.Sprintf("%s/api", serviceName), 0777)
+		if err != nil {
+			panic(err)
+		}
+
+		pkg.WriteToFile(fmt.Sprintf("%s/internal/controller/grpc/v1/error.go", serviceName), templates.GrpcV1ErrorTemplate, struct{}{})
+		pkg.WriteToFile(fmt.Sprintf("%s/internal/entity/error.go", serviceName), templates.InternalErrorTemplate, struct{}{})
 	}
 
 	pkg.ReformatFile(fmt.Sprintf("%s/internal/app/config.go", serviceName))

@@ -2,9 +2,10 @@ package models
 
 const (
 	Postgres = "PostgreSQL"
-	Kafka    = "Kafka"
-	Grpc     = "gRPC server"
-	Http     = "HTTP server"
+	Redis    = "Redis TODO"
+	Kafka    = "Kafka TODO"
+	Grpc     = "gRPC server TO_TEST"
+	Http     = "HTTP server TODO"
 )
 
 type EnabledIntegrations struct {
@@ -12,4 +13,5 @@ type EnabledIntegrations struct {
 	Kafka    bool
 	Grpc     bool
 	Http     bool
+	Redis    bool
 }

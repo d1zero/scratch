@@ -2,6 +2,10 @@ package templates
 
 import "github.com/d1zero/scratch/internal/models"
 
+type AppTemplateData struct {
+	ProjectName string
+}
+
 func BuildAppTemplate(flags models.EnabledIntegrations) string {
 	result := `package app
 
@@ -15,6 +19,12 @@ import (
 		result += `
 	
 	"github.com/d1zero/scratch/pkg/config/postgres"`
+	}
+
+	if flags.Grpc {
+		result += `
+	v1 "{{.ProjectName}}/internal/controller/grpc/v1"
+	"github.com/d1zero/scratch/pkg/config/grpc"`
 	}
 
 	result += `
@@ -55,6 +65,16 @@ func Run() {
 	defer db.Disconnect()
 
 	logger.Infof("postgres connected successfully")
+
+`
+	}
+
+	if flags.Grpc {
+		result += `
+	grpcServer := grpc.New(logger, v1.ErrCodeMap)
+
+	grpcServer.Start(cfg.GRPC)
+	defer grpcServer.Stop()
 
 `
 	}

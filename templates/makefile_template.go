@@ -31,5 +31,12 @@ migrate-version:
 	-verbose version`
 	}
 
+	if flags.Grpc {
+		result += `
+
+protoc:
+	export PATH="${PATH}:$(go env GOPATH)/bin" & protoc --go_out=. --go-grpc_out=. api/*.proto`
+	}
+
 	return result
 }
